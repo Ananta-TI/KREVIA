@@ -6,11 +6,9 @@ import { smoothScrollTo } from "@/lib/smoothScroll";
 
 export function SmoothScroll() {
   useEffect(() => {
-    // 1. Force manual scroll restoration so browsers do not jerkily snap
-    if (typeof window !== "undefined") {
-      if ("scrollRestoration" in window.history) {
-        window.history.scrollRestoration = "manual";
-      }
+    // 1. Browser yang mengurus pemulihan posisi scroll saat refresh/kembali.
+    if (typeof window !== "undefined" && "scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "auto";
     }
 
     // 2. Initialize Lenis with bespoke floating inertia physics
@@ -29,18 +27,21 @@ export function SmoothScroll() {
     // Expose lenis globally for universal access across components
     (window as unknown as { lenis?: Lenis }).lenis = lenis;
 
-    // Handle initial hash navigation if present
-    if (typeof window !== "undefined" && window.location.hash) {
-      const hashId = window.location.hash.replace(/^#/, "");
-      const targetElement = document.getElementById(hashId);
-      if (targetElement) {
-        setTimeout(() => {
-          smoothScrollTo(targetElement, {
-            duration: 1200,
-            offset: 80,
-          });
-        }, 400);
-      }
+    // 2. Gulir ke anchor awal URL (deep link / refresh pada "/#faq") —
+    //    ditunda sampai intro selesai, agar tidak berbenturan dengan kunci scroll preloader.
+    const scrollToInitialHash = () => {
+      const hash = window.location.hash;
+      if (!hash) return;
+      const element = document.getElementById(hash.replace(/^#/, ""));
+      if (!element) return;
+      smoothScrollTo(element, { duration: 1000, offset: 80 });
+    };
+
+    const isReady = document.documentElement.dataset.kreviaReady === "1";
+    if (isReady) {
+      requestAnimationFrame(scrollToInitialHash);
+    } else {
+      window.addEventListener("krevia:ready", scrollToInitialHash, { once: true });
     }
 
     // 3. Intercept all internal anchor clicks across the entire document
@@ -72,6 +73,7 @@ export function SmoothScroll() {
 
     return () => {
       document.removeEventListener("click", handleAnchorClick, { capture: true });
+      window.removeEventListener("krevia:ready", scrollToInitialHash);
       lenis.destroy();
       delete (window as unknown as { lenis?: Lenis }).lenis;
     };

@@ -4,37 +4,66 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 
+/** Kunci penanda bahwa intro sudah pernah diputar pada sesi tab ini. */
+const INTRO_STORAGE_KEY = "krevia:intro";
+
 export function Preloader() {
   const [progress, setProgress] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
   const [statusText, setStatusText] = useState("Menginisialisasi Sistem ERP...");
 
   useEffect(() => {
-    // Pin viewport strictly to top on mount
-    if (typeof window !== "undefined") {
-      if ("scrollRestoration" in window.history) {
-        window.history.scrollRestoration = "manual";
-      }
-      window.scrollTo(0, 0);
-      if (window.location.hash) {
-        window.history.replaceState(null, "", window.location.pathname);
-      }
+    const root = document.documentElement;
+    let settleTimer: number | undefined;
+    let safetyTimer: number | undefined;
+    let frame = 0;
+    let isFinished = false;
+
+    const finish = () => {
+      if (isFinished) return;
+      isFinished = true;
+      setIsComplete(true);
+      document.body.style.overflow = "";
+      const lenis = (window as unknown as { lenis?: { start: Function } }).lenis;
+      lenis?.start();
+      // Beri tahu komponen lain (mis. SmoothScroll) bahwa scroll sudah boleh berjalan.
+      root.dataset.kreviaReady = "1";
+      window.dispatchEvent(new Event("krevia:ready"));
+    };
+
+    // Kunjungan ulang dalam tab yang sama — atau deep link ke sebuah anchor:
+    // intro tidak diputar ulang, layar tidak dikunci, posisi scroll tidak direset.
+    if (root.dataset.intro === "skip") {
+      finish();
+      return;
     }
 
-    // Prevent scrolling while loading
+    try {
+      sessionStorage.setItem(INTRO_STORAGE_KEY, "1");
+    } catch {
+      /* storage diblokir (mis. mode privat) — intro tetap tampil sekali */
+    }
+
+    // Mulai dari atas hanya bila tidak ada anchor tujuan di URL.
+    const lenis = (window as unknown as {
+      lenis?: { stop: Function; start: Function; scrollTo: Function };
+    }).lenis;
+    if (!window.location.hash) {
+      window.scrollTo(0, 0);
+      lenis?.scrollTo(0, { immediate: true });
+    }
+
+    // Kunci scroll hanya selama intro benar-benar tampil.
     document.body.style.overflow = "hidden";
-    const lenis = (window as unknown as { lenis?: { stop: Function; start: Function; scrollTo: Function } }).lenis;
-    lenis?.scrollTo(0, { immediate: true });
     lenis?.stop();
 
-    // Progress counter animation
     const startTime = performance.now();
-    const duration = 1200; // 1.2 seconds total loading time
+    const duration = 1200; // total durasi intro
 
     const updateProgress = (currentTime: number) => {
       const elapsed = currentTime - startTime;
       const rawProgress = Math.min(elapsed / duration, 1);
-      
+
       // Quartic ease-out for realistic loading speed deceleration
       const easedProgress = Math.round((1 - Math.pow(1 - rawProgress, 3)) * 100);
       setProgress(easedProgress);
@@ -50,31 +79,22 @@ export function Preloader() {
       }
 
       if (rawProgress < 1) {
-        requestAnimationFrame(updateProgress);
+        frame = requestAnimationFrame(updateProgress);
       } else {
-        // Short pause at 100% before curtain reveal
-        setTimeout(() => {
-          setIsComplete(true);
-          document.body.style.overflow = "";
-          const activeLenis = (window as unknown as { lenis?: { start: Function } }).lenis;
-          activeLenis?.start();
-        }, 200);
+        // Jeda singkat di 100% sebelum tirai terangkat
+        settleTimer = window.setTimeout(finish, 200);
       }
     };
 
-    const animFrame = requestAnimationFrame(updateProgress);
+    frame = requestAnimationFrame(updateProgress);
 
-    // Safety fallback: ensure screen is never stuck
-    const fallbackTimer = setTimeout(() => {
-      setIsComplete(true);
-      document.body.style.overflow = "";
-      const activeLenis = (window as unknown as { lenis?: { start: Function } }).lenis;
-      activeLenis?.start();
-    }, 2200);
+    // Safety fallback: layar tidak pernah terkunci
+    safetyTimer = window.setTimeout(finish, 2400);
 
     return () => {
-      cancelAnimationFrame(animFrame);
-      clearTimeout(fallbackTimer);
+      cancelAnimationFrame(frame);
+      if (settleTimer) window.clearTimeout(settleTimer);
+      if (safetyTimer) window.clearTimeout(safetyTimer);
       document.body.style.overflow = "";
       const activeLenis = (window as unknown as { lenis?: { start: Function } }).lenis;
       activeLenis?.start();
@@ -86,6 +106,7 @@ export function Preloader() {
       {!isComplete && (
         <motion.div
           key="krevia-preloader"
+          data-preloader=""
           initial={{ y: 0 }}
           exit={{
             y: "-100%",

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import Image from "next/image";
-import { ArrowLeft, Shield, Lock, FileText, CheckCircle2, Mail, MapPin } from "lucide-react";
+import { Shield, Lock, FileText, CheckCircle2, Mail, MapPin } from "lucide-react";
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
 import { SITE_CONFIG } from "@/lib/constants";
 
 export const metadata: Metadata = {
@@ -12,33 +12,12 @@ export const metadata: Metadata = {
 
 export default function PrivacyPolicyPage() {
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900 flex flex-col justify-between">
-      {/* Top Header */}
-      <header className="border-b border-gray-300/90 bg-white/95 backdrop-blur-md sticky top-0 z-50 py-4">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-          <Link href="/" className="flex items-center group py-1">
-            <Image
-              src="/logo-horizontal.png"
-              alt="Krevia Digital"
-              width={375}
-              height={90}
-              className="h-8 sm:h-9 w-auto object-contain transition-transform duration-300 group-hover:scale-[1.02]"
-              priority
-            />
-          </Link>
-
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs sm:text-sm font-bold transition-colors cursor-pointer"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Kembali ke Beranda</span>
-          </Link>
-        </div>
-      </header>
+    <main className="min-h-screen bg-gray-50 text-gray-900">
+      {/* Navigasi utama bersama (single navbar) */}
+      <Navbar />
 
       {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 sm:pt-36 pb-16 sm:pb-20">
         {/* Document Header */}
         <div className="mb-12 pb-8 border-b border-gray-300">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-secondary/10 border border-secondary/20 text-primary text-xs font-bold mb-4 shadow-xs">
@@ -204,14 +183,10 @@ export default function PrivacyPolicyPage() {
             </div>
           </section>
         </div>
-      </main>
+      </div>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-300/90 bg-white py-8 text-center text-xs text-gray-500">
-        <div className="max-w-5xl mx-auto px-4">
-          <p>© {new Date().getFullYear()} Krevia Digital. Seluruh hak cipta dilindungi undang-undang.</p>
-        </div>
-      </footer>
-    </div>
+      {/* Footer bersama (single footer) */}
+      <Footer />
+    </main>
   );
 }

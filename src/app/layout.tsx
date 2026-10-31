@@ -104,7 +104,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="id">
+    <html lang="id" suppressHydrationWarning>
       <head>
         <meta httpEquiv="Content-Security-Policy" content="upgrade-insecure-requests" />
         <meta name="referrer" content="strict-origin-when-cross-origin" />
@@ -116,26 +116,15 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               try {
+                // Biarkan browser memulihkan posisi scroll saat refresh.
                 if ('scrollRestoration' in history) {
-                  history.scrollRestoration = 'manual';
+                  history.scrollRestoration = 'auto';
                 }
-                var checkReloadRedirect = function() {
-                  var nav = window.performance && window.performance.getEntriesByType && window.performance.getEntriesByType('navigation')[0];
-                  var isReload = (nav && nav.type === 'reload') || (window.performance && window.performance.navigation && window.performance.navigation.type === 1);
-                  var path = window.location.pathname || '';
-                  if (path.length > 1 && path.charAt(path.length - 1) === '/') {
-                    path = path.slice(0, -1);
-                  }
-                  if (isReload && path !== '/' && path !== '') {
-                    window.location.replace('/');
-                    return true;
-                  }
-                  return false;
-                };
-                if (!checkReloadRedirect()) {
-                  window.addEventListener('DOMContentLoaded', checkReloadRedirect);
+                // Intro (preloader) hanya diputar sekali per sesi tab,
+                // dan dilewati bila halaman dibuka langsung ke sebuah anchor.
+                if (window.location.hash || sessionStorage.getItem('krevia:intro') === '1') {
+                  document.documentElement.setAttribute('data-intro', 'skip');
                 }
-                window.scrollTo(0, 0);
               } catch (e) {}
             `,
           }}

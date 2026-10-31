@@ -1,33 +1,23 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 
 export default function Template({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const isInitialMount = useRef(true);
 
   useEffect(() => {
-    // Intercept keyboard reload shortcuts (F5, Ctrl+R, Cmd+R) on subpages to return directly to Beranda
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const isReloadKey =
-        e.key === "F5" ||
-        ((e.ctrlKey || e.metaKey) && (e.key === "r" || e.key === "R"));
+    // Hanya untuk navigasi antar-halaman di sisi klien.
+    // Pada muat pertama (refresh / deep link) posisi scroll dibiarkan
+    // dipulihkan oleh browser, agar halaman tidak "mulai dari awal" lagi.
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
 
-      const isSubpage = pathname !== "/";
-
-      if (isReloadKey && isSubpage) {
-        e.preventDefault();
-        window.location.replace("/");
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [pathname]);
-
-  useEffect(() => {
-    // When changing routes without a specific hash, scroll cleanly to top
+    // Bila tujuan navigasi punya hash sendiri, biarkan anchor yang menggulir.
     if (typeof window !== "undefined" && !window.location.hash) {
       const lenis = (window as unknown as { lenis?: { scrollTo: Function } }).lenis;
       if (lenis && typeof lenis.scrollTo === "function") {

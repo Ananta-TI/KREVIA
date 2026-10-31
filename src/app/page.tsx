@@ -19,7 +19,7 @@ export default function Home() {
       <FaqSection />
       <HomeCtaSection />
       <Footer />
-      <FloatingWhatsApp />
+      {/* <FloatingWhatsApp /> */}
     </main>
   );
 }

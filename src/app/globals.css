@@ -25,6 +25,29 @@
   --color-navy-card: #13223f;
   --color-navy-light: #1c2e4f;
 
+  /* Palet footer — tata letaknya disalin apa adanya dari flomodia.com,
+     tetapi warnanya sudah dipetakan ke palet Krevia dengan peran yang sama
+     (lihat DESIGN.md). Nama token sengaja memakai peran, bukan nama warna,
+     supaya pemetaannya bisa dibaca ulang tanpa menebak.
+
+     Peran di flomodia  ->  Krevia
+     surface  #690714 (maroon, dasar gelap)  ->  #101d35 (primary navy)
+     deep     #140003 (lebih gelap lagi)     ->  #0b1322 (navy-dark)
+     cream    #f8f5e2 (kartu/teks terang)    ->  #f1f5f9 (gray-100)
+     muted    #867b72 (teks redup)           ->  #64748b (gray-500)
+     accent   #f10424 (merah, aksi)          ->  #2563eb (secondary blue) */
+  --color-footer-deep: #0b1322;
+  --color-footer-surface: #101d35;
+  --color-footer-light: #f1f5f9;
+  --color-footer-muted: #64748b;
+  --color-footer-accent: #2563eb;
+
+  /* Titik henti desktop flomodia (992px = 62rem).
+     Harus breakpoint bernama, bukan min-[992px] arbitrer: Tailwind menaruh
+     varian min-[…] SEBELUM blok breakpoint bernama, jadi aturan
+     min-[992px]:… kalah dari md:… pada lebar ≥992px. */
+  --breakpoint-desktop: 62rem;
+
   /* Legacy aliases mapped to new brand palette */
   --color-krevia-navy: #101d35;
   --color-krevia-navy-dark: #0b1322;
@@ -86,6 +109,13 @@ body {
   overflow-x: hidden;
 }
 
+/* Preloader/intro hanya dijalankan sekali per sesi tab.
+   Penanda dipasang oleh script inline di layout sebelum paint pertama,
+   sehingga tidak ada kedipan putih saat refresh. */
+html[data-intro="skip"] [data-preloader] {
+  display: none !important;
+}
+
 /* Subtle engineering grid pattern */
 .bg-subtle-grid {
   background-size: 40px 40px;
@@ -99,6 +129,53 @@ body {
   background-image: 
     linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Footer — tekstur & mask (bentuk/warna mengikuti flomodia.com)              */
+/* -------------------------------------------------------------------------- */
+
+/* Grain film halus. Flomodia memakai .webp eksternal; di sini dibuat inline
+   dengan feTurbulence supaya tidak ada aset atau request tambahan. */
+.bg-footer-grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+  background-position: 0 0;
+  background-size: 400px 400px;
+}
+
+/* Logo dipakai sebagai mask, warna diambil dari background-color.
+   Dengan begitu mark navy bisa diwarnai persis (mis. navy #101d35
+   di atas kartu terang, atau #f1f5f9 di atas navy), tanpa filter yang
+   menebak-nebak seperti brightness/invert. */
+.mask-logo-horizontal,
+.mask-logo-mark {
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: left center;
+  mask-position: left center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+.mask-logo-horizontal {
+  -webkit-mask-image: url("/logo-horizontal.png");
+  mask-image: url("/logo-horizontal.png");
+  /* Di flomodia logo memenuhi lebar kartu saat ≤479px (jadi tinta tampak
+     di tengah), lalu mulai 480px kotaknya mengikuti rasio aslinya. */
+  -webkit-mask-position: center;
+  mask-position: center;
+}
+
+@media (min-width: 768px) {
+  .mask-logo-horizontal {
+    -webkit-mask-position: left center;
+    mask-position: left center;
+  }
+}
+
+.mask-logo-mark {
+  -webkit-mask-image: url("/logo-mark.png");
+  mask-image: url("/logo-mark.png");
 }
 
 /* Custom scrollbar */
