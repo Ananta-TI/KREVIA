@@ -1,0 +1,117 @@
+@import "tailwindcss";
+
+@theme {
+  /* Brand Colors */
+  --color-primary: #101d35;
+  --color-secondary: #2563eb;
+  --color-accent: #38bdf8;
+
+  /* Neutral Colors */
+  --color-gray-900: #0f172a;
+  --color-gray-700: #334155;
+  --color-gray-500: #64748b;
+  --color-gray-300: #cbd5e1;
+  --color-gray-100: #f1f5f9;
+  --color-gray-50: #f8fafc;
+
+  /* Semantic Colors */
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #8b5cf6;
+
+  /* Secondary Navy shades for dark card/contrast surfaces */
+  --color-navy-dark: #0b1322;
+  --color-navy-card: #13223f;
+  --color-navy-light: #1c2e4f;
+
+  /* Legacy aliases mapped to new brand palette */
+  --color-krevia-navy: #101d35;
+  --color-krevia-navy-dark: #0b1322;
+  --color-krevia-navy-card: #13223f;
+  --color-krevia-navy-light: #1c2e4f;
+  --color-krevia-secondary: #2563eb;
+  --color-krevia-accent: #38bdf8;
+  --color-krevia-teal: #38bdf8;
+  --color-krevia-teal-hover: #0284c7;
+  --color-krevia-teal-subtle: rgba(56, 189, 248, 0.12);
+  --color-krevia-soft: #f1f5f9;
+  --color-krevia-soft-border: #cbd5e1;
+  --color-krevia-canvas: #f8fafc;
+  --color-krevia-card: #ffffff;
+  --color-krevia-slate: #64748b;
+  --color-krevia-slate-dark: #334155;
+  --color-krevia-input: #101d35;
+  --color-krevia-input-border: #334155;
+
+  /* Brand Gradients */
+  --background-image-gradient-brand: linear-gradient(to right, #101d35, #38bdf8);
+}
+
+:root {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+}
+
+html {
+  color-scheme: light;
+  scroll-behavior: auto !important;
+}
+
+/* Lenis smooth scrolling rules */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+body {
+  color: var(--foreground);
+  background-color: var(--background);
+  overflow-x: hidden;
+}
+
+/* Subtle engineering grid pattern */
+.bg-subtle-grid {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(16, 29, 53, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(16, 29, 53, 0.035) 1px, transparent 1px);
+}
+
+.bg-dark-grid {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
