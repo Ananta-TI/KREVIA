@@ -1,8 +1,6 @@
 import React from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
 import { FloatingWhatsApp } from "@/components/FloatingWhatsApp";
 import { SITE_CONFIG } from "@/lib/constants";
 import {
@@ -55,8 +53,6 @@ export default function TentangKamiPage() {
 
   return (
     <main className="min-h-screen bg-gray-50 text-gray-900">
-      <Navbar />
-
       {/* Header Section */}
       <section className="pt-28 sm:pt-36 pb-12 sm:pb-16 px-4 sm:px-6 border-b border-gray-300/80 bg-white/70">
         <div className="max-w-4xl mx-auto">
@@ -207,7 +203,6 @@ export default function TentangKamiPage() {
         </div>
       </section>
 
-      <Footer />
       <FloatingWhatsApp />
     </main>
   );

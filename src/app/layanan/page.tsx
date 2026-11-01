@@ -1,8 +1,6 @@
 import React from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
 import { FloatingWhatsApp } from "@/components/FloatingWhatsApp";
 import {
   Globe,
@@ -109,8 +107,6 @@ export default function LayananPage() {
 
   return (
     <main className="min-h-screen bg-gray-50 text-gray-900">
-      <Navbar />
-
       {/* Hero Header */}
       <section className="pt-28 sm:pt-36 pb-12 sm:pb-16 px-4 sm:px-6 border-b border-gray-300/80 bg-white/70">
         <div className="max-w-6xl mx-auto">
@@ -344,7 +340,6 @@ export default function LayananPage() {
         </div>
       </section>
 
-      <Footer />
       <FloatingWhatsApp />
     </main>
   );

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import { Preloader } from "@/components/Preloader";
 import { SmoothScroll } from "@/components/SmoothScroll";
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
 import "./globals.css";
 
 const plusJakarta = Plus_Jakarta_Sans({
@@ -133,7 +135,11 @@ export default function RootLayout({
       <body className={`${plusJakarta.className} bg-gray-50 text-gray-900 antialiased selection:bg-accent/30 selection:text-primary`}>
         <Preloader />
         <SmoothScroll />
+        {/* Navbar & Footer hidup di layout, di luar template per-navigasi,
+            supaya tidak ikut dibongkar-pasang setiap pindah halaman. */}
+        <Navbar />
         {children}
+        <Footer />
       </body>
     </html>
   );

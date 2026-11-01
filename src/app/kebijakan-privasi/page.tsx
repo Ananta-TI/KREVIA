@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { Shield, Lock, FileText, CheckCircle2, Mail, MapPin } from "lucide-react";
-import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
 import { SITE_CONFIG } from "@/lib/constants";
 
 export const metadata: Metadata = {
@@ -13,9 +11,6 @@ export const metadata: Metadata = {
 export default function PrivacyPolicyPage() {
   return (
     <main className="min-h-screen bg-gray-50 text-gray-900">
-      {/* Navigasi utama bersama (single navbar) */}
-      <Navbar />
-
       {/* Main Content */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 sm:pt-36 pb-16 sm:pb-20">
         {/* Document Header */}
@@ -185,8 +180,6 @@ export default function PrivacyPolicyPage() {
         </div>
       </div>
 
-      {/* Footer bersama (single footer) */}
-      <Footer />
     </main>
   );
 }

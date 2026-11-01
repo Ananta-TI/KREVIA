@@ -1,7 +1,5 @@
 import React from "react";
 import type { Metadata } from "next";
-import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
 import { FloatingWhatsApp } from "@/components/FloatingWhatsApp";
 import { PricingPageContent } from "@/components/pricing/PricingPageContent";
 
@@ -35,9 +33,7 @@ export const metadata: Metadata = {
 export default function HargaPage() {
   return (
     <>
-      <Navbar />
       <PricingPageContent />
-      <Footer />
       <FloatingWhatsApp />
     </>
   );

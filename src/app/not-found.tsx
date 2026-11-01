@@ -1,15 +1,11 @@
 import React from "react";
 import Link from "next/link";
-import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
 import { FloatingWhatsApp } from "@/components/FloatingWhatsApp";
 import { ArrowLeft, Layers, Compass } from "lucide-react";
 
 export default function NotFound() {
   return (
     <main className="min-h-screen bg-gray-50 text-gray-900 flex flex-col justify-between">
-      <Navbar />
-
       <section className="pt-36 pb-20 px-4 sm:px-6 my-auto">
         <div className="max-w-2xl mx-auto bg-white rounded-3xl p-8 sm:p-12 border border-gray-300 shadow-sm text-center space-y-6">
           <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center text-primary mx-auto">
@@ -48,7 +44,6 @@ export default function NotFound() {
         </div>
       </section>
 
-      <Footer />
       <FloatingWhatsApp />
     </main>
   );
