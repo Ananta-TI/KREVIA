@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
-import { Preloader } from "@/components/Preloader";
+import { Plus_Jakarta_Sans, Archivo } from "next/font/google";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -10,6 +9,16 @@ const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
   display: "swap",
+});
+
+/* Judul raksasa hero memakai Archivo variable. Sumbu lebar (wdth) ikut dimuat
+   karena komponen Hero memakainya untuk mendekati Sharp Grotesk Semibold 13
+   dari situs rujukan (lihat .hero-word di globals.css). */
+const archivo = Archivo({
+  subsets: ["latin"],
+  axes: ["wdth"],
+  display: "swap",
+  variable: "--font-archivo",
 });
 
 export const metadata: Metadata = {
@@ -106,7 +115,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="id" suppressHydrationWarning>
+    <html
+      lang="id"
+      suppressHydrationWarning
+      className={archivo.variable}
+    >
       <head>
         <meta httpEquiv="Content-Security-Policy" content="upgrade-insecure-requests" />
         <meta name="referrer" content="strict-origin-when-cross-origin" />
@@ -122,10 +135,16 @@ export default function RootLayout({
                 if ('scrollRestoration' in history) {
                   history.scrollRestoration = 'auto';
                 }
-                // Intro (preloader) hanya diputar sekali per sesi tab,
-                // dan dilewati bila halaman dibuka langsung ke sebuah anchor.
-                if (window.location.hash || sessionStorage.getItem('krevia:intro') === '1') {
+                // Koreografi pembuka hero diputar pada setiap muat ulang
+                // halaman (refresh). Yang dilewati hanya deep link ke sebuah
+                // anchor dan pengguna yang meminta gerak dikurangi. Nilainya
+                // dibaca CSS + <HeroIntro /> sebelum paint pertama, jadi tidak
+                // ada kedipan kosong pada jalur lewati itu.
+                var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                if (reduced || window.location.hash) {
                   document.documentElement.setAttribute('data-intro', 'skip');
+                } else {
+                  document.documentElement.setAttribute('data-intro', 'play');
                 }
               } catch (e) {}
             `,
@@ -133,7 +152,6 @@ export default function RootLayout({
         />
       </head>
       <body className={`${plusJakarta.className} bg-gray-50 text-gray-900 antialiased selection:bg-accent/30 selection:text-primary`}>
-        <Preloader />
         <SmoothScroll />
         {/* Navbar & Footer hidup di layout, di luar template per-navigasi,
             supaya tidak ikut dibongkar-pasang setiap pindah halaman. */}

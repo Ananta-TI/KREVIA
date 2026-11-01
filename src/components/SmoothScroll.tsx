@@ -37,6 +37,13 @@ export function SmoothScroll() {
       smoothScrollTo(element, { duration: 1000, offset: 80 });
     };
 
+    // Halaman tanpa koreografi hero (semua halaman selain beranda) tidak punya
+    // komponen yang mengirim "krevia:ready"; tandai siap di sini agar anchor
+    // awal tetap digulirkan.
+    if (!document.querySelector("[data-hero-intro]")) {
+      document.documentElement.dataset.kreviaReady = "1";
+    }
+
     const isReady = document.documentElement.dataset.kreviaReady === "1";
     if (isReady) {
       requestAnimationFrame(scrollToInitialHash);

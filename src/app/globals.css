@@ -69,6 +69,28 @@
 
   /* Brand Gradients */
   --background-image-gradient-brand: linear-gradient(to right, #101d35, #38bdf8);
+
+  /* --- Hero beranda -------------------------------------------------------
+     Struktur, ukuran, dan warna disalin apa adanya dari vandslab.com (#hero);
+     hanya isi teksnya yang diganti milik Krevia Digital.
+
+     Seluruh furniture hero (blok kata, bentuk, celah antar-baris, tombol)
+     diukur dalam `em` terhadap --text-hero-main, bukan piksel tetap. Dengan
+     begitu satu komposisi yang sama ikut mengecil bersama viewport dan tidak
+     pernah meluber — masalah yang justru dimiliki situs rujukannya di bawah
+     ~1100px. Nilai acuan pada lebar 1440px (font judul 216px = 13.5rem):
+     blok kata 160px, bentuk 160px, celah 16px, tombol 253x70px. */
+  --font-hero: var(--font-archivo), "Archivo", ui-sans-serif, system-ui, sans-serif;
+  /* Archivo pada wdth 62 masih ~25% lebih lebar per huruf daripada Sharp
+     Grotesk Semibold 13 milik rujukan (0.456em vs 0.366em per karakter).
+     Karena sumbu wdth-nya tidak bisa dikecilkan lagi, ukuran judul diturunkan
+     dari 15vw ke 12vw: komposisi lalu mengisi lebar layar dalam proporsi yang
+     sama seperti rujukan (±91%) alih-alih meluber. Batas atas 13.5rem tetap
+     sama dengan rujukan, jadi di layar sangat lebar semuanya kembali identik. */
+  --text-hero-main: clamp(2.5rem, 12vw, 13.5rem);
+  --color-hero-bg: #f8fafc;
+  --color-hero-caption: #999999;
+  --color-hero-accent: #2563eb;
 }
 
 :root {
@@ -109,11 +131,51 @@ body {
   overflow-x: hidden;
 }
 
-/* Preloader/intro hanya dijalankan sekali per sesi tab.
-   Penanda dipasang oleh script inline di layout sebelum paint pertama,
-   sehingga tidak ada kedipan putih saat refresh. */
-html[data-intro="skip"] [data-preloader] {
-  display: none !important;
+/* -------------------------------------------------------------------------- */
+/*  Hero beranda                                                              */
+/* -------------------------------------------------------------------------- */
+
+/* Judul raksasa hero: Archivo variable dengan sumbu lebar (wdth) dipendekkan
+   ke 62 agar mendekati Sharp Grotesk Semibold 13 milik situs rujukan. Berat
+   600 tetap diambil dari font-weight — font-variation-settings hanya menimpa
+   sumbu yang benar-benar disebut. */
+.hero-word {
+  font-family: var(--font-hero);
+  font-variation-settings: "wdth" 62;
+  font-weight: 600;
+}
+
+/* Bentuk dekoratif yang di situs rujukan dianimasikan lewat Lottie; di sini
+   cukup SVG statis yang diputar pelan, tanpa dependensi tambahan. Titik putar
+   dikunci ke tengah bounding box supaya elemen SVG mana pun (svg luar maupun
+   <g> di dalamnya) berputar pada porosnya sendiri. */
+.hero-spin {
+  animation: hero-spin 18s linear infinite;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
+
+@keyframes hero-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-spin {
+    animation: none;
+  }
+}
+
+/* Koreografi pembuka hero berjalan pada setiap muat ulang halaman. Selama fase
+   "play", elemen yang dianimasikan disembunyikan lebih dulu supaya tidak ada
+   kedipan "muncul lalu hilang" sebelum JavaScript siap. Penanda data-intro
+   dipasang skrip inline di layout.tsx, sebelum <body> dilukis. */
+html[data-intro="play"] [data-hero-anim] {
+  opacity: 0;
 }
 
 /* Subtle engineering grid pattern */
