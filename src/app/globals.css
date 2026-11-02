@@ -71,14 +71,16 @@
   --background-image-gradient-brand: linear-gradient(to right, #101d35, #38bdf8);
 
   /* --- Hero beranda -------------------------------------------------------
-     Struktur, ukuran, dan warna disalin apa adanya dari vandslab.com (#hero);
-     hanya isi teksnya yang diganti milik Krevia Digital.
+     Struktur, ukuran, dan proporsi mengikuti vandslab.com (#hero); isi dan
+     warnanya memakai milik Krevia Digital. Tiga token di bawah adalah alias
+     peran dari palet Krevia yang sudah ada, supaya hero tidak punya warna
+     lepas dari design system.
 
      Seluruh furniture hero (blok kata, bentuk, celah antar-baris, tombol)
      diukur dalam `em` terhadap --text-hero-main, bukan piksel tetap. Dengan
      begitu satu komposisi yang sama ikut mengecil bersama viewport dan tidak
      pernah meluber — masalah yang justru dimiliki situs rujukannya di bawah
-     ~1100px. Nilai acuan pada lebar 1440px (font judul 216px = 13.5rem):
+     ~1100px. Nilai acuan pada lebar ≥1800px (font judul 216px = 13.5rem):
      blok kata 160px, bentuk 160px, celah 16px, tombol 253x70px. */
   --font-hero: var(--font-archivo), "Archivo", ui-sans-serif, system-ui, sans-serif;
   /* Archivo pada wdth 62 masih ~25% lebih lebar per huruf daripada Sharp
@@ -88,9 +90,9 @@
      sama seperti rujukan (±91%) alih-alih meluber. Batas atas 13.5rem tetap
      sama dengan rujukan, jadi di layar sangat lebar semuanya kembali identik. */
   --text-hero-main: clamp(2.5rem, 12vw, 13.5rem);
-  --color-hero-bg: #f8fafc;
-  --color-hero-caption: #999999;
-  --color-hero-accent: #2563eb;
+  --color-hero-bg: var(--color-gray-50);
+  --color-hero-caption: var(--color-gray-500);
+  --color-hero-accent: var(--color-secondary);
 }
 
 :root {

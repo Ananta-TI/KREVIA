@@ -28,7 +28,8 @@ export function SmoothScroll() {
     (window as unknown as { lenis?: Lenis }).lenis = lenis;
 
     // 2. Gulir ke anchor awal URL (deep link / refresh pada "/#faq") —
-    //    ditunda sampai intro selesai, agar tidak berbenturan dengan kunci scroll preloader.
+    //    ditunda sampai intro selesai agar tidak berebut dengan koreografi
+    //    pembuka.
     const scrollToInitialHash = () => {
       const hash = window.location.hash;
       if (!hash) return;
@@ -39,9 +40,11 @@ export function SmoothScroll() {
 
     // Halaman tanpa koreografi hero (semua halaman selain beranda) tidak punya
     // komponen yang mengirim "krevia:ready"; tandai siap di sini agar anchor
-    // awal tetap digulirkan.
+    // awal tetap digulirkan. Penanda intro juga langsung ditutup supaya
+    // kembali ke beranda lewat navigasi klien tidak memutar ulang koreografi.
     if (!document.querySelector("[data-hero-intro]")) {
       document.documentElement.dataset.kreviaReady = "1";
+      document.documentElement.dataset.intro = "done";
     }
 
     const isReady = document.documentElement.dataset.kreviaReady === "1";

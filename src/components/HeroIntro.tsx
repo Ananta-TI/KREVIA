@@ -17,15 +17,18 @@ import { useEffect } from "react";
  *               di tengah viewport
  *   0.50-1.00s  ketiganya naik/turun ke tinggi baris kedua (masih di tengah)
  *   1.00-2.00s  bentuk terbang ke slotnya
- *   2.00-2.70s  setelah bentuk diam di slotnya, kata & takarir baru masuk dari
- *               sisi masing-masing; tombol melebar dari 0 dan panahnya meluncur
+ *   2.00-2.70s  setelah bentuk diam di slotnya, kata & tombol masuk dari sisi
+ *               masing-masing; tombol melebar dari 0 dan panahnya meluncur
+ *   2.70-3.20s  takarir empat pilar menyusul setelah kata selesai
  *
  * Urutan ponsel: tiga bentuk langsung berkumpul di tengah, diam 1,5 detik,
- * lalu menyebar sampai 2 detik. Kata-kata baru masuk setelah bentuk selesai.
+ * lalu menyebar sampai 2 detik. Kata-kata baru masuk setelah bentuk selesai
+ * (tanpa takarir, karena komposisi ponsel memang tidak memuatnya).
  *
- * Scroll (desktop): begitu hero mulai keluar layar, kata-kata dan takarir
- * bergeser ke samping (+-200px) dan ke bawah (300px) secara ter-scrub,
- * sementara bentuk hanya turun.
+ * Scroll (desktop & ponsel): scroll tidak dikunci selama intro. Begitu intro
+ * selesai, kata-kata (dan takarir di desktop) bergeser ke samping (+-900px)
+ * dan ke bawah (900px) secara ter-scrub, sementara bentuk hanya turun. Titik
+ * nol scrub diambil dari posisi scroll saat intro selesai agar tidak melompat.
  * ------------------------------------------------------------------------- */
 
 /** Durasi koreografi bentuk (ms) — 2 detik seperti rujukan. */
@@ -33,6 +36,9 @@ const SHAPE_MS = 2000;
 
 /** Durasi masuknya teks & tombol setelah bentuk selesai bergerak (ms). */
 const TEXT_MS = 700;
+
+/** Durasi masuknya takarir empat pilar setelah kata selesai (ms). */
+const CAPTION_MS = 500;
 
 const EASE_OUT3 = "cubic-bezier(0.215, 0.61, 0.355, 1)";
 const EASE_INOUT3 = "cubic-bezier(0.645, 0.045, 0.355, 1)";
@@ -44,8 +50,6 @@ const SHAPE_GAP = 8;
 const MOBILE_SHAPE_GAP = 80;
 
 type Track = { el: HTMLElement; dx: number; dy: number };
-
-type LenisLike = { start: () => void; stop: () => void };
 
 function reducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -104,19 +108,14 @@ export function HeroIntro() {
       anims.push(a);
     };
 
-    const lockScroll = () => {
-      document.body.style.overflow = "hidden";
-      (window as unknown as { lenis?: LenisLike }).lenis?.stop();
-    };
-
-    const unlockScroll = () => {
-      document.body.style.overflow = "";
-      (window as unknown as { lenis?: LenisLike }).lenis?.start();
-    };
-
     /** Animasi scroll: elemen hero menyebar keluar saat hero meninggalkan layar. */
     const startScroll = () => {
-      if (!desktop || reducedMotion()) return;
+      if (reducedMotion()) return;
+
+      // Scroll tidak dikunci selama intro, jadi posisi scroll saat intro
+      // selesai dijadikan titik nol. Tanpa ini, scrub langsung melompat ke
+      // p = scrollY / 3vh dan elemen bergeser mendadak.
+      let originY = window.scrollY;
 
       const els = nodes<HTMLElement>(
         '[data-hero-anim="word"], [data-hero-anim="caption"], [data-hero-anim="btn"], [data-hero-anim="shape"]',
@@ -134,10 +133,14 @@ export function HeroIntro() {
 
       const apply = () => {
         raf = 0;
+        // Titik nol ikut turun saat pengguna menggulir ke atas. Kalau tetap
+        // di posisi saat intro selesai, ada zona mati: setelah kembali ke atas,
+        // scrub baru bergerak ketika scroll melewati posisi lama itu.
+        originY = Math.min(originY, window.scrollY);
         // Rentang scrub rujukan: "center center" -> "bottom top-=200vh",
         // yang pada hero setinggi 100vh berarti 0 -> 300vh.
         const p = Math.min(
-          Math.max(window.scrollY / (window.innerHeight * 3), 0),
+          Math.max((window.scrollY - originY) / (window.innerHeight * 3), 0),
           1,
         );
         for (const t of plan) {
@@ -188,10 +191,9 @@ export function HeroIntro() {
         arrow.style.opacity = "1";
       }
 
-      unlockScroll();
       window.dispatchEvent(new Event("krevia:ready"));
 
-      if (desktop) startScroll();
+      startScroll();
     };
 
     // Pembuka berjalan pada SETIAP muat ulang halaman (refresh), sesuai
@@ -203,8 +205,6 @@ export function HeroIntro() {
       finish();
       return;
     }
-
-    lockScroll();
 
     const vw = window.innerWidth;
 
@@ -252,12 +252,30 @@ export function HeroIntro() {
         });
       }
 
-      /* ---- Setelah bentuk diam di slotnya, kata & takarir baru masuk ---- */
-      for (const el of [...words, ...captions]) {
+      /* ---- Setelah bentuk diam di slotnya, kata-kata baru masuk ---- */
+      for (const el of words) {
         const b = box(el);
         const dir = b.cx < vw / 2 ? -1 : 1;
-        const isCaption = (el as HTMLElement).dataset.heroAnim === "caption";
-        const dy = isCaption ? (b.cy < window.innerHeight / 2 ? -40 : 40) : 0;
+        play(
+          el,
+          [
+            {
+              offset: 0,
+              transform: translate(dir * 100, 0),
+              opacity: 0,
+              easing: EASE_OUT3,
+            },
+            { offset: 1, transform: translate(0, 0), opacity: 1 },
+          ],
+          { duration: TEXT_MS, delay: SHAPE_MS },
+        );
+      }
+
+      /* ---- Takarir empat pilar menyusul setelah kata selesai ---- */
+      for (const el of captions) {
+        const b = box(el);
+        const dir = b.cx < vw / 2 ? -1 : 1;
+        const dy = b.cy < window.innerHeight / 2 ? -40 : 40;
         play(
           el,
           [
@@ -269,7 +287,7 @@ export function HeroIntro() {
             },
             { offset: 1, transform: translate(0, 0), opacity: 1 },
           ],
-          { duration: TEXT_MS, delay: SHAPE_MS },
+          { duration: CAPTION_MS, delay: SHAPE_MS + TEXT_MS },
         );
       }
 
@@ -388,7 +406,8 @@ export function HeroIntro() {
       }
     }
 
-    timers.push(window.setTimeout(() => finish(), SHAPE_MS + TEXT_MS + 80));
+    const totalMs = SHAPE_MS + TEXT_MS + (captions.length ? CAPTION_MS : 0);
+    timers.push(window.setTimeout(() => finish(), totalMs + 80));
     // Jaring pengaman: apa pun yang gagal, konten tidak pernah tertinggal kosong.
     timers.push(window.setTimeout(() => finish(), 7000));
 
@@ -397,7 +416,6 @@ export function HeroIntro() {
       if (raf) cancelAnimationFrame(raf);
       for (const a of anims) a.cancel();
       scrollCleanup?.();
-      unlockScroll();
 
       // Efek ini harus bisa dijalankan ulang dari nol. React StrictMode
       // (aktif di `next dev`) memasang, membongkar, lalu memasang lagi efek

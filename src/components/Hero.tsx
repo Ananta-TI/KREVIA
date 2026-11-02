@@ -4,10 +4,10 @@ import { HeroIntro } from "./HeroIntro";
 /**
  * Hero beranda.
  *
- * Struktur, proporsi, dan warnanya disalin apa adanya dari `#hero`
- * vandslab.com: tiga baris berisi dua kata raksasa, empat takarir layanan
- * abu-abu, tiga bentuk dekoratif, dan satu tombol kuning bertepi chamfer.
- * Yang diganti hanya isinya, agar tidak ada klaim yang tidak didukung
+ * Struktur dan proporsinya mengikuti `#hero` vandslab.com: tiga baris berisi
+ * dua kata raksasa, empat takarir layanan abu-abu, tiga bentuk dekoratif, dan
+ * satu tombol bertepi chamfer. Isi teks dan warnanya memakai milik Krevia
+ * Digital (navy, biru, abu) agar tidak ada klaim yang tidak didukung
  * (lihat ADR-0001).
  *
  * Catatan implementasi:
@@ -85,11 +85,11 @@ function ShapeAsterisk() {
   );
 }
 
-/** Empat heptagon hitam; bentuk baris kedua. */
+/** Empat heptagon navy; bentuk baris kedua. */
 function ShapeCluster() {
   return (
     <svg viewBox="0 0 160 160" className="hero-spin h-full w-full" aria-hidden="true">
-      <g className="fill-black">
+      <g className="fill-primary">
         {[0, 90, 180, 270].map((deg) => (
           <polygon
             key={deg}
@@ -102,11 +102,11 @@ function ShapeCluster() {
   );
 }
 
-/** Segi delapan hitam dengan panah abu-abu di tengahnya; bentuk baris ketiga. */
+/** Segi delapan navy dengan panah abu-abu di tengahnya; bentuk baris ketiga. */
 function ShapeArrow() {
   return (
     <svg viewBox="0 0 160 160" className="h-full w-full" aria-hidden="true">
-      <polygon points={OCTAGON_POINTS} className="fill-black" />
+      <polygon points={OCTAGON_POINTS} className="fill-primary" />
       <g transform="translate(44.68 44.08) scale(5.2)">
         <path d={ARROW_PATH} className="fill-hero-bg" />
       </g>
@@ -153,7 +153,7 @@ function Word({
         data-hero-anim="word"
         className={`hero-word inline-block leading-none ${
           boxed ? "translate-y-[0.0556em]" : ""
-        } ${accent ? "text-hero-accent" : "text-black"}`}
+        } ${accent ? "text-hero-accent" : "text-primary"}`}
       >
         {children}
       </span>
@@ -340,7 +340,7 @@ export function Hero() {
                 <ButtonEdge side="right" />
                 <span
                   data-hero-anim="label"
-                  className="block w-full pr-7 text-left text-[0.0926em] leading-none font-semibold whitespace-nowrap text-black"
+                  className="block w-full pr-7 text-left text-[0.0926em] leading-none font-semibold whitespace-nowrap text-white"
                 >
                   {CTA_LABEL}
                 </span>
