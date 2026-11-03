@@ -28,6 +28,7 @@ import { Briefcase, Wallet, Truck, Users, Check } from "lucide-react";
  * memindahkan penanda visual. Karena itu seluruh blok tetap dirender sekaligus
  * (tidak ada konten tersembunyi di balik tab), jadi pembaca layar dan tanpa-JS
  * tetap membaca keempat pilar secara berurutan.
+ * 
  */
 
 const PILLARS = [
